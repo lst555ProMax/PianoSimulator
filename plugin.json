@@ -1,0 +1,17 @@
+{
+  "pluginName": "钢琴模拟器",
+  "description": "一个基于 uTools 的虚拟钢琴模拟器",
+  "author": "YourName",
+  "homepage": "https://github.com/YourGitHub",
+  "version": "1.0.0",
+  "main": "index.html",
+  "logo": "logo.png",
+  "preload": "preload.js",
+  "platform": ["win32", "darwin", "linux"],
+  "features": [
+    {
+      "code": "piano",
+      "cmds": ["钢琴", "piano", "模拟器"]
+    }
+  ]
+} 

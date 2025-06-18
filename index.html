@@ -81,6 +81,14 @@
             transition: transform 0.05s ease-out, box-shadow 0.05s ease-out, background-color 2.5s ease-out; /* 新增 background-color 过渡，时长 2.5 秒 */
         }
 
+        /* 通用设置组样式 */
+        .setting-group {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 15px; /* 统一内部元素间距 */
+        }
+
         /* 白键样式 */
         .key.white {
             width: 50px;
@@ -140,11 +148,11 @@
             left: 0; /* 左侧对齐 */
             width: 100%; /* 宽度占满 */
             background-color: rgba(0, 0, 0, 0.8); /* 半透明背景 */
-            padding: 15px 20px;
+            padding: 10px 10px;
             display: flex; /* 使用 flex 布局 */
             justify-content: center; /* 水平居中 */
             align-items: center; /* 垂直居中 */
-            gap: 20px; /* 元素之间的间距 */
+            gap: 10px; /* 元素之间的间距 */
             z-index: 2000; /* 确保在最上层 */
             box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.3); /* 顶部阴影 */
             color: white;
@@ -174,7 +182,7 @@
         .bottom-settings-bar select:focus {
             outline: none;
             border-color: #4CAF50;
-            border-width: 2px; /* 使边框更明显 */
+            border-width: 1px; /* 使边框宽度与默认保持一致，防止布局跳动 */
         }
 
         /* 新增：下拉框选项样式 */
@@ -435,8 +443,8 @@
         </div>
 
         <!-- 音高显示选项 -->
-        <div class="note-display-options">
-            <label for="noteDisplay">音高显示 :</label>
+        <div class="note-display-options setting-group">
+            <label for="noteDisplay">音高显示</label>
             <select id="noteDisplay">
                 <option value="full">完整音高</option>
                 <option value="nameOnly">只显示音名</option>
@@ -445,8 +453,8 @@
         </div>
 
         <!-- 新增：琴键效果选项 -->
-        <div class="key-effect-options">
-            <label for="keyEffect">琴键效果 :</label>
+        <div class="key-effect-options setting-group">
+            <label for="keyEffect">琴键效果</label>
             <select id="keyEffect">
                 <option value="colorAndAnimation">颜色+动画</option>
                 <option value="colorOnly">只有颜色</option>

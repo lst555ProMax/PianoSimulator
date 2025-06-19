@@ -1,3 +1,4 @@
+const { contextBridge } = require('electron'); 
 const path = require('path');
 const { Howl, Howler } = require('howler');
 
@@ -116,9 +117,19 @@ function getNoteMapping() {
   return noteMapping;
 }
 
-// Expose functions to the renderer process (index.html)
-window.preload = {
+const api = {
   playNote: playNote,
   getNoteMapping: getNoteMapping,
-  setGlobalVolume: setGlobalVolume, // 暴露新的全局音量设置函数
-}; 
+  setGlobalVolume: setGlobalVolume,
+};
+
+try {
+  // 尝试使用现代的 contextBridge API
+  console.log("Attempting to use contextBridge...");
+  contextBridge.exposeInMainWorld('preload', api);
+  console.log("contextBridge succeeded.");
+} catch (error) {
+  // 如果失败（比如在旧的、contextIsolation=false 的环境中），回退到旧方法
+  console.warn("contextBridge failed, falling back to legacy window exposure. Error:", error.message);
+  window.preload = api;
+}

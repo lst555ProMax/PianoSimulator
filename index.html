@@ -584,14 +584,14 @@
                     }
                     keyDiv.innerHTML = noteText; // 将最终的文本赋给 innerHTML
 
-                    keyDiv.style.left = `${currentWhiteKeyLeftOffset}px`;
+                    keyDiv.style.left = `${currentWhiteKeyLeftOffset + PIANO_HORIZONTAL_PADDING}px`;
                     // keyDiv.style.top 已在 CSS 中为 .key.white 设置
 
                     piano.appendChild(keyDiv);
 
                     // 存储白键的左侧位置信息
                     whiteKeyLayoutInfo.set(noteData.name, {
-                        leftPos: currentWhiteKeyLeftOffset
+                        leftPos: currentWhiteKeyLeftOffset + PIANO_HORIZONTAL_PADDING
                     });
 
                     // 更新下一个白键的左侧偏移量
@@ -605,7 +605,7 @@
 
             // 初始滚动到中心位置，如果内容溢出
             if (scrollContainer && scrollContainer.scrollWidth > scrollContainer.clientWidth) {
-                scrollContainer.scrollLeft = (scrollContainer.scrollWidth - scrollContainer.clientWidth) / 2 - PIANO_HORIZONTAL_PADDING;
+                scrollContainer.scrollLeft = (scrollContainer.scrollWidth - scrollContainer.clientWidth) / 2;
                 console.log('Initial Scroll: scrollWidth=', scrollContainer.scrollWidth, 'clientWidth=', scrollContainer.clientWidth, 'scrollLeft=', scrollContainer.scrollLeft); // Debugging initial scroll
             }
 

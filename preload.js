@@ -133,3 +133,4 @@ try {
   console.warn("contextBridge failed, falling back to legacy window exposure. Error:", error.message);
   window.preload = api;
 }
+

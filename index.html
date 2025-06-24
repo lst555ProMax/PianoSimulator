@@ -28,17 +28,15 @@
             align-items: center; /* 垂直居中 */
             background-color: #f0f0f0;
             font-family: sans-serif;
-            /* overflow: hidden; */ /* 隐藏 body 的滚动条，现已移除以允许音符飞出屏幕 */
+            overflow: hidden; /* 隐藏滚动条 */
         }
 
         /* 内部滚动容器，负责水平滚动 */
         .scroll-container {
-            max-width: 100vw; /* 限制宽度为视口宽度，确保滚动条出现 */
+            width: 100vw;
             overflow-x: auto;
-            /* 允许水平滚动 */
-            /* overflow-y: hidden; */ /* 隐藏垂直滚动条，已移除以允许音符飞出屏幕 */
+            overflow-y: hidden;
             white-space: nowrap;
-            /* 防止内容换行 */
         }
 
         /* 钢琴主体容器 */
@@ -81,40 +79,35 @@
             transition: transform 0.05s ease-out, box-shadow 0.05s ease-out, background-color 2.5s ease-out; /* 新增 background-color 过渡，时长 2.5 秒 */
         }
 
-        /* 通用设置组样式 */
-        .setting-group {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            gap: 15px; /* 统一内部元素间距 */
-        }
-
         /* 白键样式 */
         .key.white {
-            width: 50px;
             height: 200px;
             background-color: white;
             border: 1px solid #ccc;
             border-radius: 0 0 5px 5px;
             z-index: 0;
-            /* 白键在黑键下方 */
             top: 20px;
-            /* 相对于 #piano 顶部 padding 定位 */
         }
 
         /* 黑键样式 */
         .key.black {
-            width: 30px;
             height: 120px;
             background-color: black;
             border: 1px solid #555;
             border-radius: 0 0 5px 5px;
             z-index: 1;
-            /* 黑键在白键上方 */
             color: #eee;
-            /* 黑键文字颜色 */
             top: 20px;
-            /* 黑键顶部与白键顶部对齐 */
+        }
+
+        /* 键盘映射文字样式 */
+        .key .keyboard-mapping {
+            color: #fc54da;
+            font-weight: bold;
+        }
+
+        .key.black .keyboard-mapping {
+            color: #87CEEB;
         }
 
         /* 键被按下或激活时的样式 */
@@ -123,22 +116,13 @@
             /* 向下移动 2px */
             box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2);
             /* 内部阴影 */
-        }
-
-        /* 白键激活时的样式 */
-        .key.white.active {
-            /* 背景颜色将由 JavaScript 动态设置 */
             transition: background-color 0.1s ease-out;
-            /* 快速过渡到激活颜色 */
+            /* 激活时快速过渡背景色 */
         }
 
-        /* 黑键激活时的样式（移除 transform: translateX(-50%)，只保留 translateY） */
+        /* 黑键激活时的特殊阴影效果 */
         .key.black.active {
-            transform: translateY(2px);
             box-shadow: inset 0 2px 5px rgba(255, 255, 255, 0.2);
-            /* 背景颜色将由 JavaScript 动态设置 */
-            transition: background-color 0.1s ease-out;
-            /* 快速过渡到激活颜色 */
         }
 
         /* 新增：底部设置栏样式 */
@@ -152,242 +136,214 @@
             display: flex; /* 使用 flex 布局 */
             justify-content: center; /* 水平居中 */
             align-items: center; /* 垂直居中 */
-            gap: 10px; /* 元素之间的间距 */
+            gap: 15px; /* 元素之间的间距 */
             z-index: 2000; /* 确保在最上层 */
             box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.3); /* 顶部阴影 */
             color: white;
-            font-size: 0.9em;
+            font-size: 1em;
             flex-wrap: nowrap; /* 不允许项目换行 */
+            user-select: none;
         }
 
-        /* 新增：下拉框通用样式 */
-        .bottom-settings-bar select {
+
+
+        /* 自定义下拉框样式 */
+        .custom-select {
+            position: relative;
+            display: inline-block;
+        }
+
+        .custom-select-trigger {
             padding: 8px 35px 8px 10px;
             border-radius: 5px;
             border: 1px solid #555;
             background-color: #333;
             color: white;
-            font-size: 0.9em;
-            -webkit-appearance: none; /* 移除默认样式 */
-            -moz-appearance: none;
-            appearance: none;
-            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23ffffff%22%20d%3D%22M287%2C197.9c-3.6%2C3.6-7.8%2C5.3-12.8%2C5.3s-9.2-1.8-12.8-5.3L146.2%2C88.8L30.9%2C197.9c-3.6%2C3.6-7.8%2C5.3-12.8%2C5.3s-9.2-1.8-12.8-5.3c-7-7-7-18.4%2C0-25.4l128-128c3.6-3.6%2C7.8-5.3%2C12.8-5.3s9.2%2C1.8%2C12.8%2C5.3l128%2C128C294%2C179.5%2C294%2C190.9%2C287%2C197.9z%22%2F%3E%3C%2Fsvg%3E'); /* 自定义下拉箭头 */
+            font-size: 1em;
+            cursor: pointer;
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23ffffff%22%20d%3D%22M287%2C197.9c-3.6%2C3.6-7.8%2C5.3-12.8%2C5.3s-9.2-1.8-12.8-5.3L146.2%2C88.8L30.9%2C197.9c-3.6%2C3.6-7.8%2C5.3-12.8%2C5.3s-9.2-1.8-12.8-5.3c-7-7-7-18.4%2C0-25.4l128-128c3.6-3.6%2C7.8-5.3%2C12.8-5.3s9.2%2C1.8%2C12.8%2C5.3l128%2C128C294%2C179.5%2C294%2C190.9%2C287%2C197.9z%22%2F%3E%3C%2Fsvg%3E');
             background-repeat: no-repeat;
             background-position: right 10px center;
             background-size: 10px;
-            cursor: pointer;
-            padding-right: 40px; /* 增加右侧内边距以拉开文字和下拉箭头 */
+            min-width: 120px;
+            text-align: center;
         }
 
-        .bottom-settings-bar select:focus {
+        .custom-select-trigger:focus {
             outline: none;
             border-color: #4CAF50;
-            border-width: 1px; /* 使边框宽度与默认保持一致，防止布局跳动 */
         }
 
-        /* 新增：下拉框选项样式 */
-        .bottom-settings-bar select option {
-            padding: 12px 15px; /* 增加垂直和水平内边距，使其与下拉框主题保持一致 */
-            text-align: left; /* 将文字左对齐，通常更符合用户习惯 */
-            background-color: #333; /* 与下拉框背景色一致 */
-            color: white;
-        }
-
-        .bottom-settings-bar select option:checked,
-        .bottom-settings-bar select option:hover {
-            background-color: #4CAF50; /* 选中或悬停时的背景色 */
-            color: white;
-        }
-
-        /* 滚动灵敏度控制器样式（调整为在底部栏内） */
-        .scroll-sensitivity-control {
-            position: static; /* 移除固定定位 */
-            background-color: transparent; /* 移除背景 */
-            padding: 0; /* 移除内边距 */
-            border-radius: 0;
-            box-shadow: none; /* 移除阴影 */
-            display: flex;
-            flex-direction: row; /* 水平排列 */
-            align-items: center;
-            gap: 10px;
-        }
-
-        .scroll-sensitivity-control label {
-            margin-bottom: 0; /* 移除底部外边距 */
-            font-weight: normal; /* 正常字重 */
-        }
-
-        .scroll-sensitivity-control input[type="range"] {
-            width: 120px; /* 调整滑动条宽度 */
-            -webkit-appearance: none;
-            height: 6px; /* 调整轨道高度 */
-            background: #555; /* 调整轨道背景色 */
-            border-radius: 3px;
-            outline: none;
-            opacity: 0.9;
-            transition: opacity .2s;
-        }
-
-        .scroll-sensitivity-control input[type="range"]:hover {
-            opacity: 1;
-        }
-
-        .scroll-sensitivity-control input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            background: #4CAF50;
-            cursor: grab;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-            margin-top: -6px; /* 调整滑块垂直位置 */
-        }
-
-        .scroll-sensitivity-control input[type="range"]::-webkit-slider-runnable-track {
-            background: linear-gradient(to right, #4CAF50 var(--webkit-slider-runnable-track-fill-percent, 0%), #555 var(--webkit-slider-runnable-track-fill-percent, 0%));
-            border-radius: 3px;
-        }
-
-        .scroll-sensitivity-control input[type="range"]::-moz-range-thumb {
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            background: #4CAF50;
-            cursor: grab;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-        }
-
-        .scroll-sensitivity-control input[type="range"]::-moz-range-track {
-            background: #555;
-            border-radius: 3px;
-        }
-
-        .scroll-sensitivity-control input[type="range"]::-moz-range-progress {
-            background: #4CAF50;
-            border-radius: 3px;
-            height: 6px;
-        }
-
-        /* 新增：音量控制器样式，与滚动灵敏度控制器保持一致 */
-        .volume-control {
-            position: static;
-            background-color: transparent;
-            padding: 0;
-            border-radius: 0;
-            box-shadow: none;
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .volume-control label {
-            margin-bottom: 0;
-            font-weight: normal;
-        }
-
-        .volume-control input[type="range"] {
-            width: 120px;
-            -webkit-appearance: none;
-            height: 6px;
-            background: #555;
-            border-radius: 3px;
-            outline: none;
-            opacity: 0.9;
-            transition: opacity .2s;
-        }
-
-        .volume-control input[type="range"]:hover {
-            opacity: 1;
-        }
-
-        .volume-control input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            background: #4CAF50;
-            cursor: grab;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-            margin-top: -6px;
-        }
-
-        .volume-control input[type="range"]::-webkit-slider-runnable-track {
-            background: linear-gradient(to right, #4CAF50 var(--webkit-slider-runnable-track-fill-percent, 0%), #555 var(--webkit-slider-runnable-track-fill-percent, 0%));
-            border-radius: 3px;
-        }
-
-        .volume-control input[type="range"]::-moz-range-thumb {
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            background: #4CAF50;
-            cursor: grab;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-        }
-
-        .volume-control input[type="range"]::-moz-range-track {
-            background: #555;
-            border-radius: 3px;
-        }
-
-        .volume-control input[type="range"]::-moz-range-progress {
-            background: #4CAF50;
-            border-radius: 3px;
-            height: 6px;
-        }
-
-        /* 音高显示选项容器样式（调整为在底部栏内） */
-        .note-display-options {
-            margin-top: 0; /* 移除顶部外边距 */
-            padding-top: 0; /* 移除顶部内边距 */
-            border-top: none; /* 移除边框 */
-            display: flex;
-            flex-direction: row; /* 水平排列 */
-            align-items: center;
-            gap: 15px; /* 选项之间的间距 */
-        }
-
-        .note-display-options label {
-            margin-bottom: 0; /* 移除底部外边距 */
-            font-weight: normal; /* 正常字重 */
-        }
-
-        .note-display-options div {
-            display: flex;
-            align-items: center;
-            margin-bottom: 0; /* 移除底部外边距 */
-        }
-
-        .note-display-options input[type="radio"] {
-            margin-right: 6px; /* 调整单选按钮的右侧间距 */
-            width: 14px; /* 调整单选按钮大小 */
-            height: 14px;
-            border: 1px solid #aaa; /* 调整边框颜色 */
-        }
-
-        .note-display-options input[type="radio"]:checked {
-            background-color: #4CAF50;
-            border-color: #4CAF50;
-        }
-
-        .note-display-options input[type="radio"]:checked::before {
-            content: '';
-            display: block;
-            width: 6px; /* 调整选中点大小 */
-            height: 6px;
-            background-color: white;
-            border-radius: 50%;
+        .custom-select-options {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
+            bottom: 100%;
+            left: 0;
+            right: 0;
+            background-color: #333;
+            border: 1px solid #555;
+            border-bottom: none;
+            border-radius: 5px 5px 0 0;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
         }
 
-        .note-display-options label[for] {
-            font-weight: normal;
-            margin-bottom: 0;
+        .custom-select-options.show {
+            display: block;
+        }
+
+        .custom-select-option {
+            padding: 8px 10px;
             cursor: pointer;
+            text-align: center;
+            color: white;
+            transition: background-color 0.2s;
+        }
+
+        .custom-select-option:hover {
+            background-color: #4CAF50;
+        }
+
+        .custom-select-option.selected {
+            background-color: #4CAF50;
+        }
+
+        /* 控制图标按钮样式 */
+        .control-icon {
+            background: none;
+            border: none;
+            color: purple;
+            font-size: 1.2em;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 5px;
+            transition: background-color 0.2s;
+            position: relative;
+        }
+
+        /* 滑动条控制容器 */
+        .scroll-sensitivity-control,
+        .volume-control,
+        .keyboard-size-control {
+            position: relative;
+        }
+
+        .control-icon:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .control-icon.active {
+            background-color: #4CAF50;
+        }
+
+        /* 垂直滑动条弹出面板样式 */
+        .vertical-slider-panel {
+            position: absolute;
+            bottom: calc(100% + 10px);
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.9);
+            padding: 15px 10px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            min-height: 150px;
+            z-index: 3000;
+            margin-bottom: 5px;
+        }
+
+        .vertical-slider-panel.show {
+            display: flex;
+        }
+
+        .vertical-slider-panel label {
+            color: white;
+            font-size: 1em;
+            margin-bottom: 5px;
+            text-align: center;
+        }
+
+        /* 垂直滑动条样式 */
+        .vertical-slider {
+            -webkit-appearance: slider-vertical;
+            width: 6px;
+            height: 100px;
+            background: #555;
+            outline: none;
+            opacity: 0.9;
+            transition: opacity 0.2s;
+            writing-mode: bt-lr; /* IE */
+            -webkit-appearance: slider-vertical; /* WebKit */
+        }
+
+        .vertical-slider:hover {
+            opacity: 1;
+        }
+
+        .vertical-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #4CAF50;
+            cursor: grab;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .vertical-slider::-webkit-slider-runnable-track {
+            background: #555;
+            border-radius: 3px;
+        }
+
+        .vertical-slider::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #4CAF50;
+            cursor: grab;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            border: none;
+        }
+
+        .vertical-slider::-moz-range-track {
+            background: #555;
+            border-radius: 3px;
+        }
+
+        /* 键盘映射显示开关样式 */
+        .keyboard-mapping-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .keyboard-mapping-toggle input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: #4CAF50;
+        }
+
+        .keyboard-mapping-toggle label {
+            cursor: pointer;
+            font-size: 1em;
+            color: yellow;
+        }
+
+        /* 下拉框容器样式 */
+        .note-display-options,
+        .key-effect-options {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .note-display-options label,
+        .key-effect-options label {
+            color: yellow;
         }
 
         /* 新增：飞行动画音符样式 */
@@ -432,35 +388,63 @@
     <div class="bottom-settings-bar">
         <!-- 滚动灵敏度控制器 -->
         <div class="scroll-sensitivity-control">
-            <label for="scrollSensitivity">滚动灵敏度</label>
-            <input type="range" id="scrollSensitivity" min="0.1" max="3" value="1" step="0.1">
+            <button class="control-icon" id="scrollIcon" title="滚动灵敏度（灵敏度调节建议使用鼠标滚轮）" >🖱️</button>
+            <div class="vertical-slider-panel" id="scrollPanel">
+                <label>灵敏度</label>
+                <input type="range" id="scrollSensitivity" class="vertical-slider" min="0.1" max="3" value="1" step="0.1" orient="vertical">
+            </div>
         </div>
 
         <!-- 新增：音量控制器 -->
         <div class="volume-control">
-            <label for="volumeControl">音量</label>
-            <input type="range" id="volumeControl" min="0" max="1" value="1" step="0.05">
+            <button class="control-icon" id="volumeIcon" title="音量">🔊</button>
+            <div class="vertical-slider-panel" id="volumePanel">
+                <label>音量</label>
+                <input type="range" id="volumeControl" class="vertical-slider" min="0" max="1" value="1" step="0.05" orient="vertical">
+            </div>
+        </div>
+
+        <!-- 新增：键盘尺寸控制器 -->
+        <div class="keyboard-size-control">
+            <button class="control-icon" id="sizeIcon" title="键盘尺寸 (当前: 1.2，调节为1时全屏可显示所有琴键)">📏</button>
+            <div class="vertical-slider-panel" id="sizePanel">
+                <label>尺寸</label>
+                <input type="range" id="keyboardSizeControl" class="vertical-slider" min="0.5" max="2.0" value="1.2" step="0.1" orient="vertical">
+            </div>
+        </div>
+
+        <!-- 键盘映射显示开关 -->
+        <div class="keyboard-mapping-toggle">
+            <label for="showKeyboardMapping">显示键盘映射</label>
+            <input type="checkbox" id="showKeyboardMapping" checked>
         </div>
 
         <!-- 音高显示选项 -->
-        <div class="note-display-options setting-group">
-            <label for="noteDisplay">音高显示</label>
-            <select id="noteDisplay">
-                <option value="full">完整音高</option>
-                <option value="nameOnly">只显示音名</option>
-                <option value="none">不显示</option>
-            </select>
+        <div class="note-display-options">
+            <label>音高显示</label>
+            <div class="custom-select" id="noteDisplaySelect">
+                <div class="custom-select-trigger">完整音高</div>
+                <div class="custom-select-options">
+                    <div class="custom-select-option selected" data-value="full">完整音高</div>
+                    <div class="custom-select-option" data-value="nameOnly">只显示音名</div>
+                    <div class="custom-select-option" data-value="none">不显示</div>
+                </div>
+            </div>
         </div>
 
         <!-- 新增：琴键效果选项 -->
-        <div class="key-effect-options setting-group">
-            <label for="keyEffect">琴键效果</label>
-            <select id="keyEffect">
-                <option value="colorAndAnimation">颜色+动画</option>
-                <option value="colorOnly">只有颜色</option>
-                <option value="none">默认效果</option>
-            </select>
+        <div class="key-effect-options">
+            <label>琴键效果</label>
+            <div class="custom-select" id="keyEffectSelect">
+                <div class="custom-select-trigger">颜色+动画</div>
+                <div class="custom-select-options">
+                    <div class="custom-select-option selected" data-value="colorAndAnimation">颜色+动画</div>
+                    <div class="custom-select-option" data-value="colorOnly">只有颜色</div>
+                    <div class="custom-select-option" data-value="none">默认效果</div>
+                </div>
+            </div>
         </div>
+
     </div>
 
     <script>
@@ -473,20 +457,37 @@
 
         // 新增：滚动灵敏度相关变量
         const scrollSensitivityInput = document.getElementById('scrollSensitivity');
+        const scrollIcon = document.getElementById('scrollIcon');
+        const scrollPanel = document.getElementById('scrollPanel');
         let scrollSensitivity = parseFloat(localStorage.getItem('scrollSensitivity')) || 1.0; // 从 localStorage 获取或使用默认值
         scrollSensitivityInput.value = scrollSensitivity; // 设置滑动条的初始值
-        updateSliderFill(scrollSensitivityInput); // 初始化滚动灵敏度滑块填充
 
         // 新增：音量控制相关变量
         const volumeControlInput = document.getElementById('volumeControl');
+        const volumeIcon = document.getElementById('volumeIcon');
+        const volumePanel = document.getElementById('volumePanel');
         let currentVolume = parseFloat(localStorage.getItem('currentVolume')) || 1.0; // 默认音量为 1.0 (最大)
         volumeControlInput.value = currentVolume; // 设置滑动条的初始值
-        updateSliderFill(volumeControlInput); // 初始化音量滑块填充
+        let volumeDebounceTimer = null; // 音量调节防抖定时器
+
+        // 键盘尺寸比例变量（必须在使用前声明）
+        let keyboardSizeRatio = parseFloat(localStorage.getItem('keyboardSizeRatio')) || 1.2;
+        
+        // 新增：键盘尺寸控制相关变量
+        const keyboardSizeInput = document.getElementById('keyboardSizeControl');
+        const sizeIcon = document.getElementById('sizeIcon');
+        const sizePanel = document.getElementById('sizePanel');
+        keyboardSizeInput.value = keyboardSizeRatio;
+        sizeIcon.title = `键盘尺寸 (当前: ${keyboardSizeRatio.toFixed(1)}，全屏显示时为1)`;
+
+        // 新增：键盘映射显示开关相关变量
+        const showKeyboardMappingCheckbox = document.getElementById('showKeyboardMapping');
+        let showKeyboardMapping = localStorage.getItem('showKeyboardMapping') !== 'false'; // 默认显示
+        showKeyboardMappingCheckbox.checked = showKeyboardMapping;
 
         // 新增：琴键效果选项相关变量
-        const keyEffectSelect = document.getElementById('keyEffect');
+        const keyEffectSelect = document.getElementById('keyEffectSelect');
         let currentKeyEffectMode = localStorage.getItem('keyEffectMode') || 'colorAndAnimation'; // 默认按键加颜色效果并有音符动画
-        keyEffectSelect.value = currentKeyEffectMode; // 设置下拉框的初始值
 
         // 新增：随机激活颜色数组
         const activeColors = ['#FF6B6B', '#FFA07A', '#FFD54F', '#62D2A2', '#007bff', '#A06CD5', '#FF8AD8'];
@@ -497,10 +498,11 @@
             return activeColors[randomIndex];
         }
 
+
+
         // 新增：音高显示选项相关变量
-        const noteDisplaySelect = document.getElementById('noteDisplay');
+        const noteDisplaySelect = document.getElementById('noteDisplaySelect');
         let currentNoteDisplayMode = localStorage.getItem('noteDisplayMode') || 'full'; // 默认完整音高
-        noteDisplaySelect.value = currentNoteDisplayMode; // 设置下拉框的初始值
 
         // 全局变量来存储音符文件名到完整音符名称的映射
         let fileNameToNoteNameMap = new Map();
@@ -515,19 +517,20 @@
         ];
 
         // 键的尺寸（必须与 CSS 中的值一致）
-        const WHITE_KEY_WIDTH = 50;
-        const BLACK_KEY_WIDTH = 30;
-        const PIANO_HORIZONTAL_PADDING = 20; // #piano 左右内边距
+        const BASE_WHITE_KEY_WIDTH = 48;
+        const BASE_BLACK_KEY_WIDTH = 28;
+        const BASE_BLACK_KEY_OFFSET = BASE_WHITE_KEY_WIDTH - 0.5 * BASE_BLACK_KEY_WIDTH;
+        const PIANO_HORIZONTAL_PADDING = 13.5;
+        
+        function getScaledDimensions() {
+            return {
+                whiteKeyWidth: BASE_WHITE_KEY_WIDTH * keyboardSizeRatio,
+                blackKeyWidth: BASE_BLACK_KEY_WIDTH * keyboardSizeRatio,
+                blackKeyOffset: BASE_BLACK_KEY_OFFSET * keyboardSizeRatio
+            };
+        }
 
-        // 黑键相对于其前一个白键左边缘的中心偏移量 (经验值，用于模拟真实钢琴布局)
-        // 这些值是黑键的 *中心* 相对于其关联白键 *左边缘* 的像素距离。
-        const BLACK_KEY_CENTER_OFFSETS = {
-            'C#': 35, // C# 位于 C 和 D 之间，靠近 C
-            'D#': 35, // D# 位于 D 和 E 之间，靠近 E
-            'F#': 35, // F# 位于 F 和 G 之间，靠近 F
-            'G#': 35, // G# 位于 G 和 A 之间，靠近 A
-            'A#': 35  // A# 位于 A 和 B 之间，靠近 B
-        };
+
 
         // 生成钢琴键的函数
         async function generatePianoKeys() {
@@ -562,13 +565,14 @@
                 if (!noteData) continue;
 
                 if (noteData.type === 'white') {
+                    const dimensions = getScaledDimensions();
                     const keyDiv = document.createElement('div');
                     keyDiv.classList.add('key', 'white');
-                    keyDiv.dataset.note = noteData.url.replace('.mp3', ''); // 存储文件名用于播放
-                    // 清理键位字符串，转换为小写，移除 <br> 和空格
+                    keyDiv.dataset.note = noteData.url.replace('.mp3', '');
                     keyDiv.dataset.key = noteData.key.toLowerCase().replace(/<br>/g, '').replace(/\s/g, '');
 
-                    // 根据选择的显示模式设置键的文本
+                    keyDiv.style.width = `${dimensions.whiteKeyWidth}px`;
+
                     let noteText = '';
                     if (currentNoteDisplayMode === 'full') {
                         noteText = `${noteData.name}`;
@@ -578,24 +582,24 @@
                         noteText = '';
                     }
 
-                    // 新增：如果当前键是 C4，并且不是不显示模式，则添加"中央C"文字
                     if (noteData.name === 'C4' && currentNoteDisplayMode !== 'none') {
-                        noteText = '中央C<br/>' + noteText; // 将"中央C"放在前面
+                        noteText = '中央C<br/>' + noteText;
                     }
-                    keyDiv.innerHTML = noteText; // 将最终的文本赋给 innerHTML
 
+                    noteText += '<br/>';
+                    if (showKeyboardMapping && noteData.key) {
+                        noteText += `<span class="keyboard-mapping">${noteData.key}</span>`;
+                    }
+
+                    keyDiv.innerHTML = noteText;
                     keyDiv.style.left = `${currentWhiteKeyLeftOffset + PIANO_HORIZONTAL_PADDING}px`;
-                    // keyDiv.style.top 已在 CSS 中为 .key.white 设置
-
                     piano.appendChild(keyDiv);
 
-                    // 存储白键的左侧位置信息
                     whiteKeyLayoutInfo.set(noteData.name, {
                         leftPos: currentWhiteKeyLeftOffset + PIANO_HORIZONTAL_PADDING
                     });
 
-                    // 更新下一个白键的左侧偏移量
-                    currentWhiteKeyLeftOffset += WHITE_KEY_WIDTH; // 白键紧密排列，所以直接加宽度
+                    currentWhiteKeyLeftOffset += dimensions.whiteKeyWidth;
                 }
             }
 
@@ -615,13 +619,14 @@
                 if (!noteData) continue;
 
                 if (noteData.type === 'black') {
+                    const dimensions = getScaledDimensions();
                     const keyDiv = document.createElement('div');
                     keyDiv.classList.add('key', 'black');
                     keyDiv.dataset.note = noteData.url.replace('.mp3', '');
-                    // 清理键位字符串，转换为小写，移除 <br> 和空格
                     keyDiv.dataset.key = noteData.key.toLowerCase().replace(/<br>/g, '').replace(/\s/g, '');
 
-                    // 根据选择的显示模式设置键的文本
+                    keyDiv.style.width = `${dimensions.blackKeyWidth}px`;
+
                     let noteText = '';
                     if (currentNoteDisplayMode === 'full') {
                         noteText = `${noteData.name}`;
@@ -631,18 +636,22 @@
                         noteText = '';
                     }
 
-                    // 新增：如果当前键是 C4，并且不是不显示模式，则添加"中央C"文字
                     if (noteData.name === 'C4' && currentNoteDisplayMode !== 'none') {
                         noteText = '中央C<br/>' + noteText;
                     }
+
+                    noteText += '<br/>';
+                    if (showKeyboardMapping && noteData.key) {
+                        noteText += `<span class="keyboard-mapping">${noteData.key}</span>`;
+                    }
+
                     keyDiv.innerHTML = noteText;
 
-                    const blackNoteMusicalBase = musicalNoteName.slice(0, 2); // 例如 'C#' 或 'D#'
-                    const blackNoteOctave = musicalNoteName.slice(-1); // 例如 '2'
+                    const blackNoteMusicalBase = musicalNoteName.slice(0, 2);
+                    const blackNoteOctave = musicalNoteName.slice(-1);
 
-                    let precedingWhiteNoteName; // 黑键主要关联的前一个白键的音名 (例如 C# 关联 C)
+                    let precedingWhiteNoteName;
 
-                    // 根据黑键的基础音名（C#, D#, F#, G#, A#）确定其关联的白键（C, D, F, G, A）
                     switch (blackNoteMusicalBase) {
                         case 'C#': precedingWhiteNoteName = 'C' + blackNoteOctave; break;
                         case 'D#': precedingWhiteNoteName = 'D' + blackNoteOctave; break;
@@ -651,20 +660,16 @@
                         case 'A#': precedingWhiteNoteName = 'A' + blackNoteOctave; break;
                         default:
                             console.warn(`黑键音符 ${musicalNoteName} 的基础音名不符合预期，跳过。`);
-                            continue; // 跳过不明确关联的黑键
+                            continue;
                     }
 
                     const associatedWhiteKeyInfo = whiteKeyLayoutInfo.get(precedingWhiteNoteName);
 
                     if (associatedWhiteKeyInfo) {
-                        const whiteKeyLeft = associatedWhiteKeyInfo.leftPos; // 关联白键的左侧位置
-                        let blackKeyComputedLeft;
-
-                        // 使用预定义的偏移量计算黑键的中心位置 (因为 CSS transform: translateX(-50%) 会将元素中心对齐到 left)
-                        blackKeyComputedLeft = whiteKeyLeft + BLACK_KEY_CENTER_OFFSETS[blackNoteMusicalBase];
+                        const whiteKeyLeft = associatedWhiteKeyInfo.leftPos;
+                        const blackKeyComputedLeft = whiteKeyLeft + dimensions.blackKeyOffset;
                         
                         keyDiv.style.left = `${blackKeyComputedLeft}px`;
-                        // keyDiv.style.top 已在 CSS 中为 .key.black 设置
                         piano.appendChild(keyDiv);
                     } else {
                         console.warn(`找不到黑键 ${musicalNoteName} 的关联白键，跳过。`);
@@ -719,45 +724,46 @@
 
         // 物理键盘按下事件监听器
         document.addEventListener('keydown', (e) => {
-            // 检查是否是需要映射的键，并防止按键重复触发
-            if (e.key === ' ' || e.key === ';' || e.key === '\'' || e.key === ',' ||
-                (e.key.length === 1 && /[a-z0-9]/.test(e.key.toLowerCase())) ||
-                e.key === 'Shift') { // 专门处理 Shift 键本身，不作为音符
+            if (!e.repeat) { // 仅在首次按下时触发，防止长按重复播放
+                let keyChar;
 
-                if (!e.repeat) { // 仅在首次按下时触发，防止长按重复播放
-                    let keyChar = e.key.toLowerCase();
-
-                    // 处理 Shift 组合键，例如 '⇧+A'
-                    if (e.shiftKey && e.key !== 'Shift') { // 确保不是 Shift 键本身被按下
-                        const originalKey = e.key.toUpperCase(); // 获取原始键的大写形式
-                        keyChar = '⇧+' + originalKey;
-                    } else if (e.key === 'Shift') {
-                        return; // Shift 键本身不作为音符处理
+                // 处理 Shift 组合键
+                if (e.shiftKey && e.key !== 'Shift') {
+                    // 对于数字键，使用 e.code 来获取物理键位
+                    if (e.code.startsWith('Digit')) {
+                        const digit = e.code.replace('Digit', '');
+                        keyChar = '⇧+' + digit;
+                    } else {
+                        keyChar = '⇧+' + e.key.toLowerCase();
                     }
+                } else if (e.key === 'Shift') {
+                    return; // Shift 键本身不作为音符处理
+                } else {
+                    keyChar = e.key.toLowerCase();
+                }
 
-                    const targetNoteFileName = keyboardToNoteMap[keyChar];
+                const targetNoteFileName = keyboardToNoteMap[keyChar];
 
-                    if (targetNoteFileName && !pressedKeys.has(keyChar)) {
-                        const pianoKey = document.querySelector(`.key[data-note="${targetNoteFileName}"]`);
-                        if (pianoKey) {
-                            const applyColor = currentKeyEffectMode === 'colorAndAnimation' || currentKeyEffectMode === 'colorOnly';
-                            const applyAnimation = currentKeyEffectMode === 'colorAndAnimation';
+                if (targetNoteFileName && !pressedKeys.has(keyChar)) {
+                    const pianoKey = document.querySelector(`.key[data-note="${targetNoteFileName}"]`);
+                    if (pianoKey) {
+                        const applyColor = currentKeyEffectMode === 'colorAndAnimation' || currentKeyEffectMode === 'colorOnly';
+                        const applyAnimation = currentKeyEffectMode === 'colorAndAnimation';
 
-                            if (applyColor) {
-                                pianoKey.classList.add('active');
-                                const activeColor = getRandomActiveColor(); // 获取随机激活颜色
-                                pianoKey.style.backgroundColor = activeColor; // 设置随机激活颜色
-                            } else {
-                                pianoKey.classList.add('active'); // 即使没有颜色效果，也添加 active 类来应用 transform 和 box-shadow
-                            }
+                        if (applyColor) {
+                            pianoKey.classList.add('active');
+                            const activeColor = getRandomActiveColor();
+                            pianoKey.style.backgroundColor = activeColor;
+                        } else {
+                            pianoKey.classList.add('active');
+                        }
 
-                            window.preload.playNote(targetNoteFileName, currentVolume); // 传递当前音量
-                            pressedKeys.add(keyChar);
-                            e.preventDefault(); // 阻止浏览器默认行为，如空格键滚动页面
-                            // 新增：如果开启了动画效果，则创建飞行动画音符
-                            if (applyAnimation) {
-                                createFlyingNote(pianoKey, pianoKey.style.backgroundColor); // 传递当前设置的背景颜色
-                            }
+                        window.preload.playNote(targetNoteFileName, currentVolume);
+                        pressedKeys.add(keyChar);
+                        e.preventDefault();
+                        
+                        if (applyAnimation) {
+                            createFlyingNote(pianoKey, pianoKey.style.backgroundColor);
                         }
                     }
                 }
@@ -766,14 +772,37 @@
 
         // 物理键盘松开事件监听器
         document.addEventListener('keyup', (e) => {
+            // 处理 Shift 键松开时，清理所有 Shift 组合键
+            if (e.key === 'Shift') {
+                // 遍历所有当前按下的键，找到 Shift 组合键并清理
+                const shiftKeys = Array.from(pressedKeys).filter(key => key.startsWith('⇧+'));
+                shiftKeys.forEach(shiftKey => {
+                    const targetNoteFileName = keyboardToNoteMap[shiftKey];
+                    if (targetNoteFileName) {
+                        const pianoKey = document.querySelector(`.key[data-note="${targetNoteFileName}"]`);
+                        if (pianoKey) {
+                            pianoKey.classList.remove('active');
+                            pianoKey.style.backgroundColor = '';
+                            pressedKeys.delete(shiftKey);
+                        }
+                    }
+                });
+                return;
+            }
+
             let keyChar = e.key.toLowerCase();
 
-            // 处理 Shift 组合键
-            if (e.shiftKey && e.key !== 'Shift') {
-                const originalKey = e.key.toUpperCase();
-                keyChar = '⇧+' + originalKey;
-            } else if (e.key === 'Shift') {
-                return; // Shift 键本身不作为音符处理
+            // 检查是否有对应的 Shift 组合键需要清理
+            let shiftKeyChar;
+            if (e.code && e.code.startsWith('Digit')) {
+                const digit = e.code.replace('Digit', '');
+                shiftKeyChar = '⇧+' + digit;
+            } else {
+                shiftKeyChar = '⇧+' + e.key.toLowerCase();
+            }
+            
+            if (pressedKeys.has(shiftKeyChar)) {
+                keyChar = shiftKeyChar;
             }
 
             const targetNoteFileName = keyboardToNoteMap[keyChar];
@@ -858,22 +887,121 @@
 
         // 监听鼠标滚轮事件，实现水平滚动
         window.addEventListener('wheel', (e) => {
-            // 检查 scrollContainer 是否有水平滚动条
             if (scrollContainer && scrollContainer.scrollWidth > scrollContainer.clientWidth) {
-                console.log('Wheel Event: scrollWidth=', scrollContainer.scrollWidth, 'clientWidth=', scrollContainer.clientWidth); // Debugging wheel event
-                e.preventDefault(); // 阻止默认的垂直滚动行为
+                e.preventDefault();
                 scrollContainer.scrollBy({
-                    left: e.deltaY * scrollSensitivity, // 使用灵敏度调整滚动量
-                    behavior: 'smooth' // 平滑滚动
+                    left: e.deltaY * scrollSensitivity,
+                    behavior: 'smooth'
                 });
             }
-        }, { passive: false }); // 设置 passive 为 false 允许 preventDefault
+        }, { passive: false });
+
+        // 新增：滚动灵敏度图标点击事件
+        scrollIcon.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isVisible = scrollPanel.classList.contains('show');
+            // 隐藏其他面板
+            volumePanel.classList.remove('show');
+            sizePanel.classList.remove('show');
+            volumeIcon.classList.remove('active');
+            sizeIcon.classList.remove('active');
+            // 切换当前面板
+            if (isVisible) {
+                scrollPanel.classList.remove('show');
+                scrollIcon.classList.remove('active');
+            } else {
+                scrollPanel.classList.add('show');
+                scrollIcon.classList.add('active');
+            }
+        });
+
+        // 新增：音量图标点击事件
+        volumeIcon.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isVisible = volumePanel.classList.contains('show');
+            // 隐藏其他面板
+            scrollPanel.classList.remove('show');
+            sizePanel.classList.remove('show');
+            scrollIcon.classList.remove('active');
+            sizeIcon.classList.remove('active');
+            // 切换当前面板
+            if (isVisible) {
+                volumePanel.classList.remove('show');
+                volumeIcon.classList.remove('active');
+            } else {
+                volumePanel.classList.add('show');
+                volumeIcon.classList.add('active');
+            }
+        });
+
+        // 新增：键盘尺寸图标点击事件
+        sizeIcon.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isVisible = sizePanel.classList.contains('show');
+            // 隐藏其他面板
+            scrollPanel.classList.remove('show');
+            volumePanel.classList.remove('show');
+            scrollIcon.classList.remove('active');
+            volumeIcon.classList.remove('active');
+            // 切换当前面板
+            if (isVisible) {
+                sizePanel.classList.remove('show');
+                sizeIcon.classList.remove('active');
+            } else {
+                sizePanel.classList.add('show');
+                sizeIcon.classList.add('active');
+            }
+        });
+
+        // 点击其他地方隐藏面板
+        document.addEventListener('click', () => {
+            scrollPanel.classList.remove('show');
+            volumePanel.classList.remove('show');
+            sizePanel.classList.remove('show');
+            scrollIcon.classList.remove('active');
+            volumeIcon.classList.remove('active');
+            sizeIcon.classList.remove('active');
+        });
+
+        // 阻止面板内部点击事件冒泡
+        scrollPanel.addEventListener('click', (e) => e.stopPropagation());
+        volumePanel.addEventListener('click', (e) => e.stopPropagation());
+        sizePanel.addEventListener('click', (e) => e.stopPropagation());
+
+        // 滚动灵敏度面板滚轮事件
+        scrollPanel.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const delta = e.deltaY > 0 ? -0.1 : 0.1;
+            const newValue = Math.max(0.1, Math.min(3, scrollSensitivity + delta));
+            scrollSensitivity = newValue;
+            scrollSensitivityInput.value = newValue;
+            localStorage.setItem('scrollSensitivity', scrollSensitivity.toString());
+        }, { passive: false });
+
+        // 音量面板滚轮事件
+        volumePanel.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const delta = e.deltaY > 0 ? -0.05 : 0.05;
+            const newValue = Math.max(0, Math.min(1, currentVolume + delta));
+            currentVolume = newValue;
+            volumeControlInput.value = newValue;
+            localStorage.setItem('currentVolume', currentVolume.toString());
+            window.preload.setGlobalVolume(currentVolume);
+            
+            if (volumeDebounceTimer) {
+                clearTimeout(volumeDebounceTimer);
+            }
+            volumeDebounceTimer = setTimeout(() => {
+                window.preload.playNote('C4', currentVolume);
+            }, 300);
+        }, { passive: false });
 
         // 新增：监听滚动灵敏度滑动条的变化
         scrollSensitivityInput.addEventListener('input', (e) => {
             scrollSensitivity = parseFloat(e.target.value);
             localStorage.setItem('scrollSensitivity', scrollSensitivity.toString()); // 保存到 localStorage
-            updateSliderFill(scrollSensitivityInput);
         });
 
         // 新增：监听音量控制滑动条的变化
@@ -881,7 +1009,23 @@
             currentVolume = parseFloat(e.target.value);
             localStorage.setItem('currentVolume', currentVolume.toString()); // 保存到 localStorage
             window.preload.setGlobalVolume(currentVolume); // 调用 preload.js 中的全局音量设置函数
-            updateSliderFill(volumeControlInput);
+            
+            // 清除之前的定时器
+            if (volumeDebounceTimer) {
+                clearTimeout(volumeDebounceTimer);
+            }
+            
+            // 设置新的定时器，300ms后播放音量提示
+            volumeDebounceTimer = setTimeout(() => {
+                window.preload.playNote('C4', currentVolume);
+            }, 300);
+        });
+
+        // 新增：监听键盘映射显示开关的变化
+        showKeyboardMappingCheckbox.addEventListener('change', (e) => {
+            showKeyboardMapping = e.target.checked;
+            localStorage.setItem('showKeyboardMapping', showKeyboardMapping.toString());
+            generatePianoKeys(); // 重新生成钢琴键以应用新的显示设置
         });
 
         // 新增：监听音高显示下拉框的变化
@@ -898,18 +1042,90 @@
             // 不重新生成琴键，因为效果只影响 active 状态和飞行动画，不影响键的生成
         });
 
-        // 新增：更新滑块填充颜色的函数
-        function updateSliderFill(slider) {
-            const min = parseFloat(slider.min);
-            const max = parseFloat(slider.max);
-            const value = parseFloat(slider.value);
-            const percent = ((value - min) / (max - min)) * 100;
-            slider.style.setProperty('--webkit-slider-runnable-track-fill-percent', `${percent}%`);
-        }
 
-        // 初始设置滑块填充
-        updateSliderFill(scrollSensitivityInput);
-        updateSliderFill(volumeControlInput);
+
+        // 新增：监听键盘尺寸滑动条的变化
+        keyboardSizeInput.addEventListener('input', (e) => {
+            keyboardSizeRatio = parseFloat(e.target.value);
+            localStorage.setItem('keyboardSizeRatio', keyboardSizeRatio.toString());
+            sizeIcon.title = `键盘尺寸 (当前: ${keyboardSizeRatio.toFixed(1)}，全屏显示时为1)`;
+            generatePianoKeys();
+        });
+
+        // 键盘尺寸面板滚轮事件
+        sizePanel.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const delta = e.deltaY > 0 ? -0.1 : 0.1;
+            const newValue = Math.max(0.5, Math.min(2.0, keyboardSizeRatio + delta));
+            keyboardSizeRatio = newValue;
+            keyboardSizeInput.value = newValue;
+            localStorage.setItem('keyboardSizeRatio', keyboardSizeRatio.toString());
+            sizeIcon.title = `键盘尺寸 (当前: ${keyboardSizeRatio.toFixed(1)}，全屏显示时为1)`;
+            generatePianoKeys();
+        }, { passive: false });
+
+        // 自定义下拉框功能
+        function initCustomSelect(selectElement, currentValue, onChangeCallback) {
+            const trigger = selectElement.querySelector('.custom-select-trigger');
+            const options = selectElement.querySelector('.custom-select-options');
+            const optionElements = selectElement.querySelectorAll('.custom-select-option');
+            
+            // 设置初始值
+            const initialOption = selectElement.querySelector(`[data-value="${currentValue}"]`);
+            if (initialOption) {
+                trigger.textContent = initialOption.textContent;
+                optionElements.forEach(opt => opt.classList.remove('selected'));
+                initialOption.classList.add('selected');
+            }
+            
+            // 点击触发器
+            trigger.addEventListener('click', (e) => {
+                e.stopPropagation();
+                // 关闭其他下拉框
+                document.querySelectorAll('.custom-select-options.show').forEach(opt => {
+                    if (opt !== options) opt.classList.remove('show');
+                });
+                options.classList.toggle('show');
+            });
+            
+            // 点击选项
+            optionElements.forEach(option => {
+                option.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const value = option.dataset.value;
+                    const text = option.textContent;
+                    
+                    trigger.textContent = text;
+                    optionElements.forEach(opt => opt.classList.remove('selected'));
+                    option.classList.add('selected');
+                    options.classList.remove('show');
+                    
+                    onChangeCallback(value);
+                });
+            });
+        }
+        
+        // 初始化音高显示下拉框
+        initCustomSelect(noteDisplaySelect, currentNoteDisplayMode, (value) => {
+            currentNoteDisplayMode = value;
+            localStorage.setItem('noteDisplayMode', currentNoteDisplayMode);
+            generatePianoKeys();
+        });
+        
+        // 初始化琴键效果下拉框
+        initCustomSelect(keyEffectSelect, currentKeyEffectMode, (value) => {
+            currentKeyEffectMode = value;
+            localStorage.setItem('keyEffectMode', currentKeyEffectMode);
+        });
+        
+        // 点击其他地方关闭下拉框
+        document.addEventListener('click', () => {
+            document.querySelectorAll('.custom-select-options.show').forEach(options => {
+                options.classList.remove('show');
+            });
+        });
+
     </script>
 </body>
 

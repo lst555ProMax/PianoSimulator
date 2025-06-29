@@ -71,10 +71,13 @@ const noteMapping = [
 // A map to store pre-loaded audio Howl objects
 const notesAudio = {};
 
+// 跟踪当前播放的音符数量
+let currentlyPlayingCount = 0;
+
 // Function to load all audio files.
 function loadAllNotes() {
   const fs = require('fs');
-  const sampleDir = path.join(__dirname, 'samples', 'piano');
+  const sampleDir = path.join(__dirname, '..', 'samples', 'piano');
 
   try {
     noteMapping.forEach(note => {
@@ -100,8 +103,25 @@ loadAllNotes();
 function playNote(noteFileNameWithoutExtension, volume = 1.0) {
   if (notesAudio[noteFileNameWithoutExtension]) {
     const sound = notesAudio[noteFileNameWithoutExtension];
-    sound.volume(volume); // 设置单个音符的音量
-    sound.play();
+    
+    // 根据当前播放音符数量调节音量，防止音量过载
+    let adjustedVolume = volume;
+    if (currentlyPlayingCount >= 4) {
+      adjustedVolume = volume * 0.5;
+    } else if (currentlyPlayingCount >= 2) {
+      adjustedVolume = volume * 0.7;
+    }
+    
+    sound.volume(adjustedVolume);
+    const soundId = sound.play();
+    
+    currentlyPlayingCount++;
+    
+    // 音频结束时减少计数
+    sound.once('end', () => {
+      currentlyPlayingCount--;
+    }, soundId);
+    
   } else {
     console.warn(`Note ${noteFileNameWithoutExtension} not found or not loaded.`);
   }

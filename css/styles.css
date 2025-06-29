@@ -1,0 +1,384 @@
+/* 确保全局使用 border-box 盒模型，方便计算元素尺寸 */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f0f0f0;
+    font-family: sans-serif;
+    overflow: hidden;
+}
+
+/* 内部滚动容器，负责水平滚动 */
+.scroll-container {
+    width: 100vw;
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+}
+
+/* 钢琴主体容器 */
+#piano {
+    position: relative;
+    background-color: #333;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    height: 240px;
+}
+
+/* 所有琴键的通用样式 */
+.key {
+    position: absolute;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    padding-bottom: 10px;
+    font-size: 0.9em;
+    font-weight: bold;
+    user-select: none;
+    text-align: center;
+    line-height: 1.2;
+    white-space: normal;
+    transition: transform 0.05s ease-out, box-shadow 0.05s ease-out, background-color 2.5s ease-out;
+}
+
+/* 白键样式 */
+.key.white {
+    height: 200px;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 0 0 5px 5px;
+    z-index: 0;
+    top: 20px;
+}
+
+/* 黑键样式 */
+.key.black {
+    height: 120px;
+    background-color: black;
+    border: 1px solid #555;
+    border-radius: 0 0 5px 5px;
+    z-index: 1;
+    color: #eee;
+    top: 20px;
+}
+
+/* 键盘映射文字样式 */
+.key .keyboard-mapping {
+    color: #fc54da;
+    font-weight: bold;
+}
+
+.key.black .keyboard-mapping {
+    color: #87CEEB;
+}
+
+/* 键被按下或激活时的样式 */
+.key.active {
+    transform: translateY(2px);
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.1s ease-out;
+}
+
+.key.black.active {
+    box-shadow: inset 0 2px 5px rgba(255, 255, 255, 0.2);
+}
+
+/* 底部设置栏样式 */
+.bottom-settings-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    padding: 10px 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    z-index: 2000;
+    box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.3);
+    color: white;
+    font-size: 1em;
+    flex-wrap: nowrap;
+    user-select: none;
+}
+
+/* 自定义下拉框样式 */
+.custom-select {
+    position: relative;
+    display: inline-block;
+}
+
+.custom-select-trigger {
+    padding: 8px 35px 8px 10px;
+    border-radius: 5px;
+    border: 1px solid #555;
+    background-color: #333;
+    color: white;
+    font-size: 1em;
+    cursor: pointer;
+    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23ffffff%22%20d%3D%22M287%2C197.9c-3.6%2C3.6-7.8%2C5.3-12.8%2C5.3s-9.2-1.8-12.8-5.3L146.2%2C88.8L30.9%2C197.9c-3.6%2C3.6-7.8%2C5.3-12.8%2C5.3s-9.2-1.8-12.8-5.3c-7-7-7-18.4%2C0-25.4l128-128c3.6-3.6%2C7.8-5.3%2C12.8-5.3s9.2%2C1.8%2C12.8%2C5.3l128%2C128C294%2C179.5%2C294%2C190.9%2C287%2C197.9z%22%2F%3E%3C%2Fsvg%3E');
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 10px;
+    min-width: 120px;
+    text-align: center;
+}
+
+.custom-select-trigger:focus {
+    outline: none;
+    border-color: #4CAF50;
+}
+
+.custom-select-options {
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    right: 0;
+    background-color: #333;
+    border: 1px solid #555;
+    border-bottom: none;
+    border-radius: 5px 5px 0 0;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 1000;
+    display: none;
+}
+
+.custom-select-options.show {
+    display: block;
+}
+
+.custom-select-option {
+    padding: 8px 10px;
+    cursor: pointer;
+    text-align: center;
+    color: white;
+    transition: background-color 0.2s;
+}
+
+.custom-select-option:hover {
+    background-color: #4CAF50;
+}
+
+.custom-select-option.selected {
+    background-color: #4CAF50;
+}
+
+/* 控制图标按钮样式 */
+.control-icon {
+    background: none;
+    border: none;
+    color: purple;
+    font-size: 1.2em;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 5px;
+    transition: background-color 0.2s;
+    position: relative;
+}
+
+.scroll-sensitivity-control,
+.volume-control,
+.keyboard-size-control,
+.midi-speed-control {
+    position: relative;
+}
+
+.control-icon:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.control-icon.active {
+    background-color: #4CAF50;
+}
+
+.control-icon:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* 垂直滑动条弹出面板样式 */
+.vertical-slider-panel {
+    position: absolute;
+    bottom: calc(100% + 10px);
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.9);
+    padding: 15px 10px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    min-height: 150px;
+    z-index: 3000;
+    margin-bottom: 5px;
+}
+
+.vertical-slider-panel.show {
+    display: flex;
+}
+
+.vertical-slider-panel label {
+    color: white;
+    font-size: 1em;
+    margin-bottom: 5px;
+    text-align: center;
+}
+
+/* 垂直滑动条样式 */
+.vertical-slider {
+    -webkit-appearance: slider-vertical;
+    width: 6px;
+    height: 100px;
+    background: #555;
+    outline: none;
+    opacity: 0.9;
+    transition: opacity 0.2s;
+    writing-mode: bt-lr;
+}
+
+.vertical-slider:hover {
+    opacity: 1;
+}
+
+.vertical-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #4CAF50;
+    cursor: grab;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.vertical-slider::-webkit-slider-runnable-track {
+    background: #555;
+    border-radius: 3px;
+}
+
+.vertical-slider::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #4CAF50;
+    cursor: grab;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    border: none;
+}
+
+.vertical-slider::-moz-range-track {
+    background: #555;
+    border-radius: 3px;
+}
+
+/* 键盘映射显示开关样式 */
+.keyboard-mapping-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.keyboard-mapping-toggle input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: #4CAF50;
+}
+
+.keyboard-mapping-toggle label {
+    cursor: pointer;
+    font-size: 1em;
+    color: yellow;
+}
+
+/* 下拉框容器样式 */
+.note-display-options,
+.key-effect-options {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.note-display-options label,
+.key-effect-options label {
+    color: yellow;
+}
+
+/* 左上角MIDI控制样式 */
+.top-midi-controls {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background-color: rgba(0, 0, 0, 0.8);
+    padding: 10px 15px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+}
+
+.top-midi-controls .midi-speed-control {
+    position: relative;
+}
+
+.top-midi-controls #midiSpeedDisplay {
+    color: #4CAF50;
+    font-size: 0.8em;
+    font-weight: bold;
+    text-align: center;
+    margin-top: 5px;
+}
+
+.top-midi-controls .vertical-slider-panel {
+    top: calc(100% + 10px);
+    bottom: auto;
+}
+
+/* 飞行动画音符样式 */
+.flying-note {
+    position: absolute;
+    font-size: 1.2em;
+    font-weight: bold;
+    color: white;
+    text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+    pointer-events: none;
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+    z-index: 100;
+    white-space: nowrap;
+}
+
+/* 动画关键帧 */
+@keyframes fly-up {
+    0% {
+        opacity: 1;
+        transform: translateY(0);
+        font-size: 3em;
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(-1200px);
+        font-size: 4.5em;
+    }
+}

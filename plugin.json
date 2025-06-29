@@ -5,8 +5,8 @@
   "homepage": "https://github.com/YourGitHub",
   "version": "1.0.0",
   "main": "index.html",
-  "logo": "logo.png",
-  "preload": "preload.js",
+  "logo": "css/logo.png",
+  "preload": "js/preload.js",
   "platform": ["win32", "darwin", "linux"],
   "features": [
     {
